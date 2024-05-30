@@ -176,9 +176,9 @@ int test() {
     token test_token = tests[i];
     token lexer_token = test_lexer.nextToken();
 
-    std::cout << test_token.type << " | " << lexer_token.type << '\n';
-
     // ~~~ debugging ~~~
+    // std::cout << test_token.type << " | " << lexer_token.type << '\n';
+
     // auto test_literal_string = std::get_if<std::string>(&test_token.literal);
     // auto lexer_literal_string =
     // std::get_if<std::string>(&lexer_token.literal);
