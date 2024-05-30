@@ -27,3 +27,8 @@
 /**/*.log
 
 .cache/
+
+
+# Do not ignore CMakeLists.txt
+!CMakeLists.txt
+!src/CMakeLists.txt
