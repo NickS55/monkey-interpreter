@@ -30,13 +30,31 @@ public:
     m_read_position += 1;
   }
 
+  std::string readNumber() {
+    std::string number{};
+    do {
+      number += m_byte;
+      if (isdigit(m_input[m_read_position])) {
+        readChar();
+      } else {
+        break;
+      }
+    } while (isdigit(m_byte));
+
+    return number;
+  }
+
   bool isLetter(char byte) { return isalpha(byte) || byte == '_'; }
 
   std::string readIdentifier() {
     std::string word{};
     while (isLetter(m_byte)) {
       word += m_byte;
-      readChar();
+      if (isalpha(m_input[m_read_position])) {
+        readChar();
+      } else {
+        break;
+      }
     }
     return word;
   };
@@ -84,7 +102,8 @@ public:
         token_type keyword = getKeyword(word);
         tok = token(keyword, word);
       } else if (isdigit(m_byte)) {
-        tok = token(token_type::integer, m_byte);
+        std::string number = readNumber();
+        tok = token(token_type::integer, number);
       } else {
         tok = token(token_type::illegal, m_byte);
       }
@@ -115,7 +134,7 @@ int test() {
       token(token_type::let, "let"),
       token(token_type::identifier, "five"),
       token(token_type::assign, '='),
-      token(token_type::integer, '5'),
+      token(token_type::integer, "5"),
       token(token_type::semicolon, ';'),
       token(token_type::let, "let"),
       token(token_type::identifier, "ten"),
@@ -159,20 +178,23 @@ int test() {
 
     std::cout << test_token.type << " | " << lexer_token.type << '\n';
 
-    auto test_literal_string = std::get_if<std::string>(&test_token.literal);
-    auto lexer_literal_string = std::get_if<std::string>(&lexer_token.literal);
-
-    auto test_literal_char = std::get_if<char>(&test_token.literal);
-    auto lexer_literal_char = std::get_if<char>(&lexer_token.literal);
-
-    if (test_literal_string && lexer_literal_string) {
-      std::cout << *test_literal_string << " | " << *lexer_literal_string
-                << '\n';
-    } else {
-      std::cout << *test_literal_char << " | " << *lexer_literal_char << '\n';
-    }
-
-    std::cout << '\n';
+    // ~~~ debugging ~~~
+    // auto test_literal_string = std::get_if<std::string>(&test_token.literal);
+    // auto lexer_literal_string =
+    // std::get_if<std::string>(&lexer_token.literal);
+    //
+    // auto test_literal_char = std::get_if<char>(&test_token.literal);
+    // auto lexer_literal_char = std::get_if<char>(&lexer_token.literal);
+    //
+    // if (test_literal_string && lexer_literal_string) {
+    //   std::cout << *test_literal_string << " | " << *lexer_literal_string
+    //             << '\n';
+    // } else {
+    //   std::cout << *test_literal_char << " | " << *lexer_literal_char <<
+    //   '\n';
+    // }
+    //
+    // std::cout << '\n';
 
     assert((test_token.type == lexer_token.type) &&
            "test token does not match token in lexer");
