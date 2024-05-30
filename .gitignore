@@ -1,0 +1,29 @@
+# Ignore the CMake build files
+/CMakeCache.txt
+/CMakeFiles/
+/CMakeDirectoryInformation.cmake
+/cmake_install.cmake
+/Makefile
+/CMakeConfigureLog.yaml
+/pkgRedirects
+/progress.marks
+
+# Ignore src build files
+/src/CMakeFiles/
+/src/CMakeDirectoryInformation.cmake
+/src/cmake_install.cmake
+/src/Makefile
+/src/monkey
+/src/progress.marks
+
+# Ignore object files and other intermediate files
+/**/*.o
+/**/*.o.d
+/**/*.bin
+/**/*.tmp
+/**/*.make
+/**/*.marks
+/**/*.txt
+/**/*.log
+
+.cache/
