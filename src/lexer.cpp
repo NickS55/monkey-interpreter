@@ -30,11 +30,19 @@ public:
     m_read_position += 1;
   }
 
+  char peekChar() {
+    if (m_read_position >= m_input.size()) {
+      return 0;
+    } else {
+      return m_input[m_read_position];
+    }
+  }
+
   std::string readNumber() {
     std::string number{};
     do {
       number += m_byte;
-      if (isdigit(m_input[m_read_position])) {
+      if (isdigit(peekChar())) {
         readChar();
       } else {
         break;
@@ -50,7 +58,7 @@ public:
     std::string word{};
     while (isLetter(m_byte)) {
       word += m_byte;
-      if (isalpha(m_input[m_read_position])) {
+      if (isalpha(peekChar())) {
         readChar();
       } else {
         break;
@@ -70,7 +78,12 @@ public:
     skipWhitespace(m_byte);
     switch (m_byte) {
     case '=':
-      tok = token(token_type::assign, m_byte);
+      if ('=' == peekChar()) {
+        readChar();
+        tok = token(token_type::equal, "==");
+      } else {
+        tok = token(token_type::assign, m_byte);
+      }
       break;
     case ';':
       tok = token(token_type::semicolon, m_byte);
@@ -87,11 +100,34 @@ public:
     case '+':
       tok = token(token_type::plus, m_byte);
       break;
+    case '-':
+      tok = token(token_type::minus, m_byte);
+      break;
     case '{':
       tok = token(token_type::lsquirly, m_byte);
       break;
     case '}':
       tok = token(token_type::rsquirly, m_byte);
+      break;
+    case '!':
+      if ('=' == peekChar()) {
+        readChar();
+        tok = token(token_type::not_equal, "!=");
+      } else {
+        tok = token(token_type::bang, m_byte);
+      }
+      break;
+    case '<':
+      tok = token(token_type::lt, m_byte);
+      break;
+    case '>':
+      tok = token(token_type::gt, m_byte);
+      break;
+    case '*':
+      tok = token(token_type::asterisk, m_byte);
+      break;
+    case '/':
+      tok = token(token_type::slash, m_byte);
       break;
     case '\0':
       tok = token(token_type::eof, m_byte);
@@ -125,10 +161,17 @@ public:
 int test() {
   std::string input = "let five = 5;"
                       "let ten = 10;"
-                      "let add = fn(x, y) {"
-                      "x + y;"
-                      "};"
-                      "let result = add(five, ten);";
+                      "let add = fn(x, y) { x + y; };"
+                      "let result = add(five, ten);"
+                      "!-/*5;"
+                      "5 < 10 > 5;"
+                      "if (5 < 10) {"
+                      "return true;"
+                      "} else {"
+                      "return false;"
+                      "}"
+                      "10 == 10;"
+                      "10 != 9;";
 
   std::vector<token> tests{
       token(token_type::let, "let"),
@@ -167,18 +210,58 @@ int test() {
       token(token_type::identifier, "ten"),
       token(token_type::rparen, ')'),
       token(token_type::semicolon, ';'),
+      token(token_type::bang, '!'),
+      token(token_type::minus, '-'),
+      token(token_type::slash, '/'),
+      token(token_type::asterisk, '*'),
+      token(token_type::integer, "5"),
+      token(token_type::semicolon, ';'),
+      token(token_type::integer, "5"),
+      token(token_type::lt, '<'),
+      token(token_type::integer, "10"),
+      token(token_type::gt, '>'),
+      token(token_type::integer, "5"),
+      token(token_type::semicolon, ';'),
+      token(token_type::if_T, "if"),
+      token(token_type::lparen, '('),
+      token(token_type::integer, "5"),
+      token(token_type::lt, '<'),
+      token(token_type::integer, "10"),
+      token(token_type::rparen, ')'),
+      token(token_type::lsquirly, '{'),
+      token(token_type::return_T, "return"),
+      token(token_type::true_T, "true"),
+      token(token_type::semicolon, ';'),
+      token(token_type::rsquirly, '}'),
+      token(token_type::else_T, "else"),
+      token(token_type::lsquirly, '{'),
+      token(token_type::return_T, "return"),
+      token(token_type::false_T, "false"),
+      token(token_type::semicolon, ';'),
+      token(token_type::rsquirly, '}'),
+      token(token_type::integer, "10"),
+      token(token_type::equal, "=="),
+      token(token_type::integer, "10"),
+      token(token_type::semicolon, ';'),
+      token(token_type::integer, "10"),
+      token(token_type::not_equal, "!="),
+      token(token_type::integer, "9"),
+      token(token_type::semicolon, ';'),
       token(token_type::eof, '\0'),
   };
 
   lexer test_lexer{lexer(input)};
 
-  for (int i = 0; i < tests.size() - 1; i++) {
+  for (int i = 0; i < tests.size(); i++) {
     token test_token = tests[i];
     token lexer_token = test_lexer.nextToken();
 
     // ~~~ debugging ~~~
-    // std::cout << test_token.type << " | " << lexer_token.type << '\n';
 
+    // std::cout << "test"
+    //           << " | "
+    //           << "input" << '\n';
+    // std::cout << test_token.type << " | " << lexer_token.type << '\n';
     // auto test_literal_string = std::get_if<std::string>(&test_token.literal);
     // auto lexer_literal_string =
     // std::get_if<std::string>(&lexer_token.literal);

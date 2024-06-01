@@ -12,6 +12,12 @@ enum token_type {
   integer,
   assign,
   plus,
+  minus,
+  bang,
+  slash,
+  asterisk,
+  lt,
+  gt,
   comma,
   semicolon,
   lparen,
@@ -20,6 +26,13 @@ enum token_type {
   rsquirly,
   function,
   let,
+  if_T,
+  else_T,
+  return_T,
+  true_T,
+  false_T,
+  equal,
+  not_equal,
 };
 
 struct token {

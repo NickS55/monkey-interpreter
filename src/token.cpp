@@ -15,9 +15,12 @@ token::token(const token_type type, std::string literal)
 
 token_type getKeyword(std::string word) {
   std::map<std::string, token_type> keywords = {
-      {"fn", token_type::function},
-      {"let", token_type::let},
+      {"fn", token_type::function},     {"let", token_type::let},
+      {"true", token_type::true_T},     {"false", token_type::false_T},
+      {"if", token_type::if_T},         {"else", token_type::else_T},
+      {"return", token_type::return_T},
   };
+
   auto keyword{keywords.find(word)};
 
   if (keyword == keywords.end()) {
