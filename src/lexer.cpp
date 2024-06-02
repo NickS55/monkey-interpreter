@@ -1,164 +1,155 @@
 #include <cassert>
 #include <cctype>
-#include <cstddef>
 #include <ctype.h>
 #include <iostream>
 #include <string>
 #include <variant>
 #include <vector>
 
+#include "lexer.h"
 #include "token.h"
 
-class lexer {
-private:
-  std::string m_input;
-  size_t m_position;
-  size_t m_read_position;
-  char m_byte;
+Lexer::Lexer(std::string input)
+    : m_input(input), m_position(0), m_read_position(1), m_byte{input[0]} {}
 
-public:
-  lexer(std::string input)
-      : m_input(input), m_position(0), m_read_position(1), m_byte{input[0]} {}
-
-  void readChar() {
-    if (m_read_position >= m_input.size()) {
-      m_byte = 0;
-    } else {
-      m_byte = m_input[m_read_position];
-    }
-    m_position = m_read_position;
-    m_read_position += 1;
+void Lexer::readChar() {
+  if (m_read_position >= m_input.size()) {
+    m_byte = 0;
+  } else {
+    m_byte = m_input[m_read_position];
   }
+  m_position = m_read_position;
+  m_read_position += 1;
+}
 
-  char peekChar() {
-    if (m_read_position >= m_input.size()) {
-      return 0;
-    } else {
-      return m_input[m_read_position];
-    }
+char Lexer::peekChar() const {
+  if (m_read_position >= m_input.size()) {
+    return 0;
+  } else {
+    return m_input[m_read_position];
   }
+}
 
-  std::string readNumber() {
-    std::string number{};
-    do {
-      number += m_byte;
-      if (isdigit(peekChar())) {
-        readChar();
-      } else {
-        break;
-      }
-    } while (isdigit(m_byte));
-
-    return number;
-  }
-
-  bool isLetter(char byte) { return isalpha(byte) || byte == '_'; }
-
-  std::string readIdentifier() {
-    std::string word{};
-    while (isLetter(m_byte)) {
-      word += m_byte;
-      if (isalpha(peekChar())) {
-        readChar();
-      } else {
-        break;
-      }
-    }
-    return word;
-  };
-
-  void skipWhitespace(char m_byte) {
-    if (m_byte == ' ' || m_byte == '\n') {
+std::string Lexer::readNumber() {
+  std::string number{};
+  do {
+    number += m_byte;
+    if (isdigit(peekChar())) {
       readChar();
-    }
-  }
-
-  token nextToken() {
-    token tok{};
-    skipWhitespace(m_byte);
-    switch (m_byte) {
-    case '=':
-      if ('=' == peekChar()) {
-        readChar();
-        tok = token(token_type::equal, "==");
-      } else {
-        tok = token(token_type::assign, m_byte);
-      }
-      break;
-    case ';':
-      tok = token(token_type::semicolon, m_byte);
-      break;
-    case '(':
-      tok = token(token_type::lparen, m_byte);
-      break;
-    case ')':
-      tok = token(token_type::rparen, m_byte);
-      break;
-    case ',':
-      tok = token(token_type::comma, m_byte);
-      break;
-    case '+':
-      tok = token(token_type::plus, m_byte);
-      break;
-    case '-':
-      tok = token(token_type::minus, m_byte);
-      break;
-    case '{':
-      tok = token(token_type::lsquirly, m_byte);
-      break;
-    case '}':
-      tok = token(token_type::rsquirly, m_byte);
-      break;
-    case '!':
-      if ('=' == peekChar()) {
-        readChar();
-        tok = token(token_type::not_equal, "!=");
-      } else {
-        tok = token(token_type::bang, m_byte);
-      }
-      break;
-    case '<':
-      tok = token(token_type::lt, m_byte);
-      break;
-    case '>':
-      tok = token(token_type::gt, m_byte);
-      break;
-    case '*':
-      tok = token(token_type::asterisk, m_byte);
-      break;
-    case '/':
-      tok = token(token_type::slash, m_byte);
-      break;
-    case '\0':
-      tok = token(token_type::eof, m_byte);
-      break;
-    default:
-      if (isalpha(m_byte)) {
-        std::string word = readIdentifier();
-        token_type keyword = getKeyword(word);
-        tok = token(keyword, word);
-      } else if (isdigit(m_byte)) {
-        std::string number = readNumber();
-        tok = token(token_type::integer, number);
-      } else {
-        tok = token(token_type::illegal, m_byte);
-      }
+    } else {
       break;
     }
-    readChar();
-    return tok;
-  }
+  } while (isdigit(m_byte));
 
-  void print() const {
-    std::cout << "\nLexer State:\n";
-    std::cout << "Input: " << m_input << "\n";
-    std::cout << "Position: " << m_position << "\n";
-    std::cout << "Read Position: " << m_read_position << "\n";
-    std::cout << "Current Byte: " << m_byte << "\n";
+  return number;
+}
+
+bool Lexer::isLetter(char ch) const { return isalpha(ch) || ch == '_'; }
+
+std::string Lexer::readIdentifier() {
+  std::string word{};
+  while (isLetter(m_byte)) {
+    word += m_byte;
+    if (isalpha(peekChar())) {
+      readChar();
+    } else {
+      break;
+    }
   }
+  return word;
 };
 
-int test() {
+void Lexer::skipWhitespace(char m_byte) {
+  if (m_byte == ' ' || m_byte == '\n') {
+    readChar();
+  }
+}
+
+token Lexer::nextToken() {
+  token tok{};
+  skipWhitespace(m_byte);
+  switch (m_byte) {
+  case '=':
+    if ('=' == peekChar()) {
+      readChar();
+      tok = token(token_type::equal, "==");
+    } else {
+      tok = token(token_type::assign, m_byte);
+    }
+    break;
+  case ';':
+    tok = token(token_type::semicolon, m_byte);
+    break;
+  case '(':
+    tok = token(token_type::lparen, m_byte);
+    break;
+  case ')':
+    tok = token(token_type::rparen, m_byte);
+    break;
+  case ',':
+    tok = token(token_type::comma, m_byte);
+    break;
+  case '+':
+    tok = token(token_type::plus, m_byte);
+    break;
+  case '-':
+    tok = token(token_type::minus, m_byte);
+    break;
+  case '{':
+    tok = token(token_type::lsquirly, m_byte);
+    break;
+  case '}':
+    tok = token(token_type::rsquirly, m_byte);
+    break;
+  case '!':
+    if ('=' == peekChar()) {
+      readChar();
+      tok = token(token_type::not_equal, "!=");
+    } else {
+      tok = token(token_type::bang, m_byte);
+    }
+    break;
+  case '<':
+    tok = token(token_type::lt, m_byte);
+    break;
+  case '>':
+    tok = token(token_type::gt, m_byte);
+    break;
+  case '*':
+    tok = token(token_type::asterisk, m_byte);
+    break;
+  case '/':
+    tok = token(token_type::slash, m_byte);
+    break;
+  case '\0':
+    tok = token(token_type::eof, m_byte);
+    break;
+  default:
+    if (isalpha(m_byte)) {
+      std::string word = readIdentifier();
+      token_type keyword = ::getKeyword(word);
+      tok = token(keyword, word);
+    } else if (isdigit(m_byte)) {
+      std::string number = readNumber();
+      tok = token(token_type::integer, number);
+    } else {
+      tok = token(token_type::illegal, m_byte);
+    }
+    break;
+  }
+  readChar();
+  return tok;
+}
+
+void Lexer::print() const {
+  std::cout << "\nLexer State:\n";
+  std::cout << "Input: " << m_input << "\n";
+  std::cout << "Position: " << m_position << "\n";
+  std::cout << "Read Position: " << m_read_position << "\n";
+  std::cout << "Current Byte: " << m_byte << "\n";
+}
+
+int lexerTest() {
   std::string input = "let five = 5;"
                       "let ten = 10;"
                       "let add = fn(x, y) { x + y; };"
@@ -250,7 +241,7 @@ int test() {
       token(token_type::eof, '\0'),
   };
 
-  lexer test_lexer{lexer(input)};
+  Lexer test_lexer{Lexer(input)};
 
   for (int i = 0; i < tests.size(); i++) {
     token test_token = tests[i];
@@ -286,9 +277,4 @@ int test() {
            "test char does not match token in lexer");
   }
   return 1;
-}
-
-int main() {
-  test();
-  return 0;
 }

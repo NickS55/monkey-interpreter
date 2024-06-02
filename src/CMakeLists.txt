@@ -2,12 +2,16 @@
 set(SOURCES
     lexer.cpp
     token.cpp
+    repl.cpp
+    main.cpp
 )
 
 # Add the header files
 set(HEADERS
     lexer.h
     token.h
+    repl.h
+    main.h
 )
 
 # Add the executable target

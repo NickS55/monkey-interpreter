@@ -45,4 +45,5 @@ struct token {
 };
 
 token_type getKeyword(std::string word);
+
 #endif // TOKEN_H
