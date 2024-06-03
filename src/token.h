@@ -42,6 +42,8 @@ struct token {
   token();
   token(const token_type type, char literal);
   token(const token_type type, std::string literal);
+
+  void print() const;
 };
 
 token_type getKeyword(std::string word);

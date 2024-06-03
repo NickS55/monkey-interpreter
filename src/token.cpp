@@ -1,4 +1,6 @@
 #include "token.h"
+#include <iomanip>
+#include <iostream>
 #include <map>
 #include <string>
 
@@ -12,6 +14,21 @@ token::token(const token_type type, char literal)
 // Implement the constructor for a token with a string literal
 token::token(const token_type type, std::string literal)
     : type(type), literal(literal) {}
+
+void token::print() const {
+  const int leftWidth = 12;
+
+  auto literal_string = std::get_if<std::string>(&literal);
+  auto literal_char = std::get_if<char>(&literal);
+
+  if (literal_string) {
+    std::cout << std::setw(leftWidth) << *literal_string;
+
+  } else {
+    std::cout << std::setw(leftWidth) << *literal_char;
+  }
+  std::cout << " | " << type << '\n';
+}
 
 token_type getKeyword(std::string word) {
   std::map<std::string, token_type> keywords = {

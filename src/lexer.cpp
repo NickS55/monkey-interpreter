@@ -141,12 +141,16 @@ token Lexer::nextToken() {
   return tok;
 }
 
-void Lexer::print() const {
-  std::cout << "\nLexer State:\n";
-  std::cout << "Input: " << m_input << "\n";
-  std::cout << "Position: " << m_position << "\n";
-  std::cout << "Read Position: " << m_read_position << "\n";
-  std::cout << "Current Byte: " << m_byte << "\n";
+void Lexer::print() {
+  token tok{};
+  while (true) {
+    tok = nextToken();
+    if (tok.type == token_type::eof) {
+      break;
+    } else {
+      tok.print();
+    }
+  }
 }
 
 int lexerTest() {
@@ -253,9 +257,9 @@ int lexerTest() {
     //           << " | "
     //           << "input" << '\n';
     // std::cout << test_token.type << " | " << lexer_token.type << '\n';
-    // auto test_literal_string = std::get_if<std::string>(&test_token.literal);
-    // auto lexer_literal_string =
-    // std::get_if<std::string>(&lexer_token.literal);
+    // auto test_literal_string =
+    // std::get_if<std::string>(&test_token.literal); auto
+    // lexer_literal_string = std::get_if<std::string>(&lexer_token.literal);
     //
     // auto test_literal_char = std::get_if<char>(&test_token.literal);
     // auto lexer_literal_char = std::get_if<char>(&lexer_token.literal);
