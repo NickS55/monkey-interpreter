@@ -1,8 +1,8 @@
 #include <cassert>
 #include <cctype>
 #include <ctype.h>
+#include <iostream>
 #include <string>
-// #include <iostream>
 #include <variant>
 #include <vector>
 
@@ -257,20 +257,7 @@ int lexerTest() {
     //           << " | "
     //           << "input" << '\n';
     // std::cout << test_token.type << " | " << lexer_token.type << '\n';
-    // auto test_literal_string = std::get_if<std::string>(&test_token.literal);
-    // auto lexer_literal_string =
-    // std::get_if<std::string>(&lexer_token.literal);
-    //
-    // auto test_literal_char = std::get_if<char>(&test_token.literal);
-    // auto lexer_literal_char = std::get_if<char>(&lexer_token.literal);
-    //
-    // if (test_literal_string && lexer_literal_string) {
-    //   std::cout << *test_literal_string << " | " << *lexer_literal_string
-    //             << '\n';
-    // } else {
-    //   std::cout << *test_literal_char << " | " << *lexer_literal_char <<
-    //   '\n';
-    // }
+    // std::cout << test_token.literal << " | " << lexer_token.literal << '\n';
 
     assert((test_token.type == lexer_token.type) &&
            "test token does not match token in lexer");
