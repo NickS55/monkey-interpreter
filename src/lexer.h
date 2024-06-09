@@ -24,7 +24,7 @@ private:
 
 public:
   Lexer(std::string input);
-  token nextToken();
+  Token nextToken();
   void print();
 };
 

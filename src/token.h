@@ -3,7 +3,6 @@
 
 #include <map>
 #include <string>
-#include <variant>
 
 enum token_type {
   illegal,
@@ -35,13 +34,13 @@ enum token_type {
   not_equal,
 };
 
-struct token {
+struct Token {
   token_type type;
-  std::variant<std::string, char> literal;
+  std::string literal;
 
-  token();
-  token(const token_type type, char literal);
-  token(const token_type type, std::string literal);
+  Token();
+  Token(const token_type type, char literal);
+  Token(const token_type type, std::string literal);
 
   void print() const;
 };
