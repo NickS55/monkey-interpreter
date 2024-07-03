@@ -4,6 +4,8 @@
 #include "token.h"
 
 // Return Statement
+const void ReturnStatement::statementNode() const {}
+
 const std::string ReturnStatement::TokenLiteral() const {
   return token.literal;
 }
