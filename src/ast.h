@@ -51,4 +51,12 @@ public:
   const std::string TokenLiteral() const override;
 };
 
+class ReturnStatement : public Statement {
+public:
+  Token token{};
+  std::unique_ptr<Expression> returnValue{};
+  const void statementNode() const;
+  const std::string TokenLiteral() const override;
+};
+
 #endif // AST_H

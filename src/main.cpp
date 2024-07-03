@@ -7,6 +7,7 @@
 int main() {
   lexerTest();
   testLetStatements();
+  testReturnStatements();
   std::cout << "Unit Tests Passed!" << '\n';
   std::cout << "Hello! Welcome to the Monkey Programming Language REPL."
             << '\n';

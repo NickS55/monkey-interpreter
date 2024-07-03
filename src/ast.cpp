@@ -3,6 +3,11 @@
 #include "ast.h"
 #include "token.h"
 
+// Return Statement
+const std::string ReturnStatement::TokenLiteral() const {
+  return token.literal;
+}
+
 // Let Statement
 const void LetStatement::statementNode() const {}
 

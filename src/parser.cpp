@@ -75,12 +75,28 @@ std::unique_ptr<Statement> Parser::parseLetStatement() {
   return statement;
 }
 
+std::unique_ptr<Statement> Parser::parseReturnStatement() {
+  std::unique_ptr<ReturnStatement> statement =
+      std::make_unique<ReturnStatement>();
+
+  statement->token = m_curToken;
+
+  // TODO: Skipping the expression until we find a semicolon
+  while (m_curToken.type != token_type::semicolon) {
+    nextToken();
+  }
+
+  return statement;
+}
+
 std::unique_ptr<Statement> Parser::parseStatement() {
   switch (m_curToken.type) {
   case token_type::let:
     return parseLetStatement();
+  case token_type::return_T:
+    return parseReturnStatement();
   default:
-    assert("unknown token type");
+    assert(false && "unknown token type");
     return nullptr;
   }
 }
@@ -140,6 +156,39 @@ void testLetStatements() {
            "dynamic_cast to LetStatement failed, letStatement is a nullptr");
 
     testLetStatement(letStatement, tests[i]);
+  }
+};
+
+void testReturnStatement(){
+
+};
+
+void testReturnStatements() {
+  std::string input = "return 5;"
+                      "return 10;"
+                      "return 993322;";
+
+  Lexer lexer(input);
+  Parser parser(lexer);
+
+  Program program(parser.parseProgram());
+
+  checkParserErrors(parser);
+
+  assert((program.statements.size() == 3) &&
+         "program.statements does not equal 3");
+
+  for (int i = 0; i < program.statements.size(); i++) {
+    auto *returnStatement =
+        dynamic_cast<ReturnStatement *>(program.statements[i].get());
+
+    assert(
+        (returnStatement) &&
+        "dynamic_cast to returnStatement failed, returnStatement is a nullptr");
+
+    assert(returnStatement->TokenLiteral() == "return");
+
+    // TODO: expression parsing testing
   }
 };
 

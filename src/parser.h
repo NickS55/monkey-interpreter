@@ -15,6 +15,7 @@ private:
   Token m_peekToken;
 
   std::unique_ptr<Statement> parseLetStatement();
+  std::unique_ptr<Statement> parseReturnStatement();
 
 public:
   std::vector<std::string> m_errors{};
@@ -28,6 +29,7 @@ public:
 
 void checkParserErrors(Parser P);
 void testLetStatements();
+void testReturnStatements();
 void testLetStatement(Statement *statement, std::string &name);
 
 #endif // !PARSER_H
