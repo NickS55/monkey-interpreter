@@ -15,6 +15,13 @@ const void LetStatement::statementNode() const {}
 
 const std::string LetStatement::TokenLiteral() const { return token.literal; }
 
+// Expression Statement
+const void ExpressionStatement::statementNode() const {}
+
+const std::string ExpressionStatement::TokenLiteral() const {
+  return token.literal;
+}
+
 // Program
 const std::string Program::TokenLiteral() const {
   if (statements.size() > 0) {
