@@ -39,8 +39,6 @@ struct Token {
   std::string literal;
 
   Token();
-  // is this needed anymore (char literal)?
-  Token(const token_type type, char literal);
   Token(const token_type type, std::string literal);
 
   void print() const;

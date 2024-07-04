@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "ast.h"
 #include "lexer.h"
 #include "parser.h"
 #include "repl.h"
@@ -8,6 +9,7 @@ int main() {
   lexerTest();
   testLetStatements();
   testReturnStatements();
+  testString();
   std::cout << "Unit Tests Passed!" << '\n';
   std::cout << "Hello! Welcome to the Monkey Programming Language REPL."
             << '\n';

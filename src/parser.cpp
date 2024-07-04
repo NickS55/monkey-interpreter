@@ -159,10 +159,6 @@ void testLetStatements() {
   }
 };
 
-void testReturnStatement(){
-
-};
-
 void testReturnStatements() {
   std::string input = "return 5;"
                       "return 10;"
@@ -188,8 +184,6 @@ void testReturnStatements() {
 
     assert(returnStatement->TokenLiteral() == "return");
 
-    // TODO: expression parsing testing
+    // expression parsing testing
   }
 };
-
-// done
