@@ -10,22 +10,25 @@
 #include "parser.h"
 #include "token.h"
 
-void checkParserErrors(Parser p) {
-  int numErrors = p.m_errors.size();
-  if (numErrors == 0) {
-    return;
-  }
-  std::cout << "parser has " << numErrors << " errors.";
-  for (int i = 0; i < numErrors; i++) {
-    std::cout << "Parser Error: " << p.m_errors[i] << '\n';
-  }
-  std::exit(1);
-}
-
 Parser::Parser(Lexer lexer) : m_lexer(lexer), m_curToken(), m_peekToken() {
   nextToken();
   nextToken();
+
+  registerPrefix(token_type::identifier,
+                 [this]() { return parseIdentifier(); });
 };
+
+std::unique_ptr<Expression> Parser::parseIdentifier() {
+  return std::make_unique<Identifier>(m_curToken, m_curToken.literal);
+};
+
+void Parser::registerPrefix(token_type t, prefixParseFn fn) {
+  prefixParseFns.emplace(t, fn);
+};
+
+void Parser::registerInfix(token_type t, infixParseFn fn) {
+  infixParseFns.emplace(t, fn);
+}
 
 void Parser::nextToken() {
   m_curToken = m_peekToken;
@@ -46,6 +49,26 @@ bool Parser::expectPeek(token_type t) {
   }
   peekError(t);
   return false;
+}
+
+std::unique_ptr<ExpressionStatement> Parser::parseExpressionStatement() {
+  auto ES = std::make_unique<ExpressionStatement>();
+  ES->token = m_curToken;
+  ES->expression = parseExpression(precedence::LOWEST);
+
+  if (m_curToken.type == token_type::semicolon)
+    nextToken();
+
+  return ES;
+}
+
+std::unique_ptr<Expression> Parser::parseExpression(precedence psrecedence) {
+  auto prefix = prefixParseFns.find(m_curToken.type);
+  if (prefix == prefixParseFns.end()) {
+    return nullptr;
+  }
+  auto leftExp = prefix->second();
+  return leftExp;
 }
 
 std::unique_ptr<Statement> Parser::parseLetStatement() {
@@ -96,8 +119,7 @@ std::unique_ptr<Statement> Parser::parseStatement() {
   case token_type::return_T:
     return parseReturnStatement();
   default:
-    assert(false && "unknown token type");
-    return nullptr;
+    return parseExpressionStatement();
   }
 }
 
@@ -186,4 +208,41 @@ void testReturnStatements() {
 
     // expression parsing testing
   }
+};
+
+void checkParserErrors(Parser p) {
+  int numErrors = p.m_errors.size();
+  if (numErrors == 0) {
+    return;
+  }
+  std::cout << "parser has " << numErrors << " errors.";
+  for (int i = 0; i < numErrors; i++) {
+    std::cout << "Parser Error: " << p.m_errors[i] << '\n';
+  }
+  std::exit(1);
+}
+
+void testIdentifierExpression() {
+  std::string input = "foobar";
+
+  Lexer lexer(input);
+  Parser parser(lexer);
+  Program program(parser.parseProgram());
+
+  checkParserErrors(parser);
+
+  assert(program.statements.size() == 1 &&
+         "program doesn't have the correct num of statements");
+
+  auto *statement =
+      dynamic_cast<ExpressionStatement *>(program.statements[0].get());
+
+  assert(statement && "expresstion not Expression");
+
+  auto *identifier = dynamic_cast<Identifier *>(statement->expression.get());
+
+  assert(identifier && "expresstion not Identifier");
+  assert(identifier->value == "foobar" && "identifier's value is not foobar");
+  assert(identifier->TokenLiteral() == "foobar" &&
+         "identifier's token literal is not foobar");
 };

@@ -6,10 +6,12 @@
 #include "repl.h"
 
 int main() {
+  // TODO: clean up test cases.
   lexerTest();
   testLetStatements();
   testReturnStatements();
   testString();
+  testIdentifierExpression();
   std::cout << "Unit Tests Passed!" << '\n';
   std::cout << "Hello! Welcome to the Monkey Programming Language REPL."
             << '\n';
