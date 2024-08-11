@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -16,11 +17,27 @@ Parser::Parser(Lexer lexer) : m_lexer(lexer), m_curToken(), m_peekToken() {
 
   registerPrefix(token_type::identifier,
                  [this]() { return parseIdentifier(); });
+
+  registerPrefix(token_type::integer,
+                 [this]() { return parseIntegerLiteral(); });
 };
 
 std::unique_ptr<Expression> Parser::parseIdentifier() {
   return std::make_unique<Identifier>(m_curToken, m_curToken.literal);
 };
+
+std::unique_ptr<Expression> Parser::parseIntegerLiteral() {
+  try {
+    int value = std::stoi(m_curToken.literal);
+    auto literal = std::unique_ptr<IntegerLiteral>(
+        std::make_unique<IntegerLiteral>(m_curToken, value));
+    return literal;
+  } catch (const std::invalid_argument &) {
+    std::string Error("Could not parse " + m_curToken.literal + " as integer.");
+    m_errors.push_back(std::move(Error));
+    return nullptr;
+  }
+}
 
 void Parser::registerPrefix(token_type t, prefixParseFn fn) {
   prefixParseFns.emplace(t, fn);
@@ -56,7 +73,7 @@ std::unique_ptr<ExpressionStatement> Parser::parseExpressionStatement() {
   ES->token = m_curToken;
   ES->expression = parseExpression(precedence::LOWEST);
 
-  if (m_curToken.type == token_type::semicolon)
+  if (m_peekToken.type == token_type::semicolon)
     nextToken();
 
   return ES;
@@ -64,6 +81,7 @@ std::unique_ptr<ExpressionStatement> Parser::parseExpressionStatement() {
 
 std::unique_ptr<Expression> Parser::parseExpression(precedence psrecedence) {
   auto prefix = prefixParseFns.find(m_curToken.type);
+  std::cout << '\n' << m_curToken.type << '\n';
   if (prefix == prefixParseFns.end()) {
     return nullptr;
   }
@@ -223,7 +241,7 @@ void checkParserErrors(Parser p) {
 }
 
 void testIdentifierExpression() {
-  std::string input = "foobar";
+  std::string input = "foobar;";
 
   Lexer lexer(input);
   Parser parser(lexer);
@@ -246,3 +264,32 @@ void testIdentifierExpression() {
   assert(identifier->TokenLiteral() == "foobar" &&
          "identifier's token literal is not foobar");
 };
+
+void testIntegerLiteralExpression() {
+
+  std::string input = "5;";
+
+  Lexer lexer(input);
+  Parser parser(lexer);
+  Program program(parser.parseProgram());
+
+  checkParserErrors(parser);
+
+  assert(program.statements.size() == 1 &&
+         "testIntegerLiteralExpression: program doesn't have the correct num "
+         "of statements");
+
+  auto *statement =
+      dynamic_cast<ExpressionStatement *>(program.statements[0].get());
+
+  assert(statement && "expression is not a statement");
+
+  auto *literal = dynamic_cast<IntegerLiteral *>(statement->expression.get());
+
+  assert(literal && "expresstion not Integer Literal");
+
+  assert(literal->value == 5 && "identifier's value is not 5");
+
+  assert(literal->TokenLiteral() == "5" &&
+         "identifier's token literal is not 5");
+}

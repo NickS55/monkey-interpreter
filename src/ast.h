@@ -79,6 +79,20 @@ public:
   const std::string TokenLiteral() const override;
 };
 
+class IntegerLiteral : public Expression {
+public:
+  IntegerLiteral() = default;
+  IntegerLiteral(Token token, const int value);
+  virtual ~IntegerLiteral() = default;
+
+  Token token{};
+  int value;
+
+  std::string string() const override;
+  const void expressionNode() const;
+  const std::string TokenLiteral() const override;
+};
+
 void testString();
 
 #endif // AST_H

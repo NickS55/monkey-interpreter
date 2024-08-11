@@ -44,6 +44,7 @@ public:
   void registerPrefix(token_type t, prefixParseFn fn);
   void registerInfix(token_type t, infixParseFn fn);
   std::unique_ptr<Expression> parseExpression(precedence precedence);
+  std::unique_ptr<Expression> parseIntegerLiteral();
   std::unique_ptr<Expression> parseIdentifier();
 
   std::map<token_type, prefixParseFn> prefixParseFns;
@@ -55,5 +56,6 @@ void testLetStatements();
 void testReturnStatements();
 void testLetStatement(Statement *statement, std::string &name);
 void testIdentifierExpression();
+void testIntegerLiteralExpression();
 
 #endif // !PARSER_H

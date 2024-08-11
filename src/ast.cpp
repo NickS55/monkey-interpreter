@@ -97,6 +97,21 @@ std::string ExpressionStatement::string() const {
   return SS.str();
 }
 
+// Constructor implementation
+IntegerLiteral::IntegerLiteral(Token token, const int value)
+    : token(token), value(value) {}
+
+// Implementation of virtual function string()
+std::string IntegerLiteral::string() const { return std::to_string(value); }
+
+// Implementation of virtual function expressionNode()
+const void IntegerLiteral::expressionNode() const {
+  // Function implementation (assuming it doesn't need to return anything)
+}
+
+// Implementation of virtual function TokenLiteral()
+const std::string IntegerLiteral::TokenLiteral() const { return token.literal; }
+
 void testString() {
   std::vector<std::unique_ptr<Statement>> statements{};
 
